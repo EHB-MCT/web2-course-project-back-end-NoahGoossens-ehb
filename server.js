@@ -72,6 +72,14 @@ app.delete("/golfcourses/:id", auth, async (req, res) => {
 
   send(res, 200, { message: "Deleted" });
 });
+//competitions 
+
+//weather 
+
+//profile + favorites
+
+//auth 
+
 
 //start server --> call function from database.js
 await connectDB();
