@@ -18,4 +18,6 @@ https://www.npmjs.com/package/bcrypt --> hashing for next security
 //https://www.mongodb.com/docs/drivers/node/v6.17/crud/query/specify-documents-to-return/
 //https://www.geeksforgeeks.org/mongodb/how-to-perform-a-find-operation-with-sorting-in-mongodb-using-nodejs/
 https://www.w3schools.in/express-js/jwt-authentication-with-mongodb
+https://chatgpt.com/share/695836af-1048-8000-83ae-c084d39caa5f
+
 

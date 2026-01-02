@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { ObjectId } from "mongodb";
 import { connectDB, getDB } from "./database.js";
@@ -60,7 +60,7 @@ app.post("/golfcourses", auth, async (req, res) => {
   };
 
   const r = await getDB().collection("courses").insertOne(doc);
-  send(res, 201, { _id: r.insertedId, ...doc, ...(isLegend ? { easterEgg: "🏌️ Legend detected" } : {}) });
+  send(res, 201, { _id: r.insertedId, ...doc, ...(isLegend ? {  easterEgg: "🏌️ Legend detected" } : {}) });//easteregg hihi
 });
 
 app.delete("/golfcourses/:id", auth, async (req, res) => {
@@ -135,8 +135,71 @@ app.get("/users/:id", auth, async (req, res) => {
   send(res, 200, { id: user._id, username: user.username, email: user.email, handicapLevel: user.handicapLevel, favorites });
 });
 
-//auth 
 
+app.put("/users/:id/favorites", auth, async (req, res) => {
+  const { id } = req.params;
+  const { courseId, action } = req.body;
+
+  // eigen profiel aanpassen
+  if (req.user.sub !== id) return send(res, 401, { message: "Unauthorized" });
+
+  //  ids geldig zijn?
+  if (!ObjectId.isValid(id) || !ObjectId.isValid(courseId)) 
+    return send(res, 400, { message: "Invalid id" });
+
+  const users = getDB().collection("users");
+  const uId = new ObjectId(id);
+  const cId = new ObjectId(courseId);
+
+  // haal de user op
+  const user = await users.findOne({ _id: uId });
+  if (!user) return send(res, 404, { message: "User not found" });
+
+  // check of course al favoriet is
+  const has = (user.favorites || []).some((f) => f.toString() === cId.toString());
+
+  // voeg toe of verwijder favorite
+  if (action === "add" && !has) await users.updateOne({ _id: uId }, { $push: { favorites: cId } });
+  if (action === "remove" && has) await users.updateOne({ _id: uId }, { $pull: { favorites: cId } });
+
+  // Feedback geven
+  send(res, 200, { message: "Updated" });
+});
+
+//auth 
+app.post("/auth/register", async (req, res) => {
+  const { username, email, password, handicapLevel = "Beginner" } = req.body;
+  if (!username || !email || !password) return send(res, 400, { message: "Missing fields" });
+
+  const users = getDB().collection("users");
+  const exists = await users.findOne({ email: String(email).toLowerCase().trim() });
+  if (exists) return send(res, 409, { message: "Email already registered" });
+
+  const userDoc = {
+    username: String(username).trim(),
+    email: String(email).toLowerCase().trim(),
+    passwordHash: await bcrypt.hash(password, 10),
+    handicapLevel: String(handicapLevel).trim(),
+    favorites: [],
+    createdAt: new Date()
+  };
+
+  const r = await users.insertOne(userDoc);
+  send(res, 201, { token: tokenFor(r.insertedId.toString()), user: { id: r.insertedId, username: userDoc.username, handicapLevel: userDoc.handicapLevel } });
+});
+
+app.post("/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return send(res, 400, { message: "Missing fields" });
+
+  const user = await getDB().collection("users").findOne({ email: String(email).toLowerCase().trim() });
+  if (!user) return send(res, 401, { message: "Invalid login" });
+
+  const ok = await bcrypt.compare(password, user.passwordHash);
+  if (!ok) return send(res, 401, { message: "Invalid login" });
+
+  send(res, 200, { token: tokenFor(user._id.toString()), user: { id: user._id, username: user.username, handicapLevel: user.handicapLevel } });
+});
 
 //start server --> call function from database.js
 await connectDB();
