@@ -15,6 +15,7 @@ https://www.npmjs.com/package/jsonwebtoken
 //https://www.mongodb.com/docs/drivers/node/current/connect/mongoclient/
 //https://www.geeksforgeeks.org/mongodb/how-to-connect-mongodb-database-using-node-js/
 https://www.npmjs.com/package/bcrypt --> hashing for next security
-
-
+//https://www.mongodb.com/docs/drivers/node/v6.17/crud/query/specify-documents-to-return/
+//https://www.geeksforgeeks.org/mongodb/how-to-perform-a-find-operation-with-sorting-in-mongodb-using-nodejs/
+https://www.w3schools.in/express-js/jwt-authentication-with-mongodb
 

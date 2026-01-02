@@ -74,9 +74,6 @@ app.delete("/golfcourses/:id", auth, async (req, res) => {
 });
 //competitions 
 
-
-//https://www.mongodb.com/docs/drivers/node/v6.17/crud/query/specify-documents-to-return/
-//https://www.geeksforgeeks.org/mongodb/how-to-perform-a-find-operation-with-sorting-in-mongodb-using-nodejs/
 //Get
 app.get("/competitions", async (req, res) => {
   const { level, sort = "date", order = "asc" } = req.query;
@@ -120,9 +117,23 @@ app.delete("/competitions/:id", auth, async (req, res) => {
   send(res, 200, { message: "Deleted" });
 });
 
-//weather 
+//weather (extra)
 
 //profile + favorites
+app.get("/users/:id", auth, async (req, res) => {
+  const { id } = req.params;
+   // alleen je profiel bekijken
+  if (req.user.sub !== id) return send(res, 401, { message: "Unauthorized" });
+  if (!ObjectId.isValid(id)) return send(res, 400, { message: "Invalid id" });
+ // data ophalen uit mongo
+  const user = await getDB().collection("users").findOne({ _id: new ObjectId(id) });
+  if (!user) return send(res, 404, { message: "User not found" });
+//favoriete courses ophalen
+  const favIds = (user.favorites || []).map((x) => new ObjectId(x));
+  const favorites = favIds.length ? await getDB().collection("courses").find({ _id: { $in: favIds } }).toArray() : [];
+
+  send(res, 200, { id: user._id, username: user.username, email: user.email, handicapLevel: user.handicapLevel, favorites });
+});
 
 //auth 
 
