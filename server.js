@@ -74,6 +74,52 @@ app.delete("/golfcourses/:id", auth, async (req, res) => {
 });
 //competitions 
 
+
+//https://www.mongodb.com/docs/drivers/node/v6.17/crud/query/specify-documents-to-return/
+//https://www.geeksforgeeks.org/mongodb/how-to-perform-a-find-operation-with-sorting-in-mongodb-using-nodejs/
+//Get
+app.get("/competitions", async (req, res) => {
+  const { level, sort = "date", order = "asc" } = req.query;
+  const filter = level ? { level } : {};
+
+  const sortField = sort === "price" ? "entryFee" : "date";
+  const dir = order === "desc" ? -1 : 1;
+
+  const comps = await getDB().collection("competitions").find(filter).sort({ [sortField]: dir }).toArray();
+  send(res, 200, comps);
+});
+//get
+app.get("/competitions/:id", async (req, res) => {
+  const { id } = req.params;
+  if (!ObjectId.isValid(id)) return send(res, 400, { message: "Invalid id" });
+
+  const comp = await getDB().collection("competitions").findOne({ _id: new ObjectId(id) });
+  if (!comp) return send(res, 404, { message: "Competition not found" });
+
+  send(res, 200, comp);
+});
+//post
+app.post("/competitions", auth, async (req, res) => {
+  const { title, date, level, entryFee, courseId } = req.body;
+  if (!title || !date || !level || typeof entryFee !== "number" || !courseId) return send(res, 400, { message: "Missing or invalid data" });
+  if (!ObjectId.isValid(courseId)) return send(res, 400, { message: "Invalid courseId" });
+
+  const doc = { title: String(title).trim(), date: new Date(date), level: String(level).trim(), entryFee, courseId: new ObjectId(courseId) };
+  const r = await getDB().collection("competitions").insertOne(doc);
+
+  send(res, 201, { _id: r.insertedId, ...doc });
+});
+//delete
+app.delete("/competitions/:id", auth, async (req, res) => {
+  const { id } = req.params;
+  if (!ObjectId.isValid(id)) return send(res, 400, { message: "Invalid id" });
+
+  const r = await getDB().collection("competitions").deleteOne({ _id: new ObjectId(id) });
+  if (!r.deletedCount) return send(res, 404, { message: "Competition not found" });
+
+  send(res, 200, { message: "Deleted" });
+});
+
 //weather 
 
 //profile + favorites
