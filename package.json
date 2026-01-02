@@ -21,6 +21,7 @@
   "homepage": "https://github.com/EHB-MCT/web2-course-project-back-end-NoahGoossens-ehb#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^5.2.1",
