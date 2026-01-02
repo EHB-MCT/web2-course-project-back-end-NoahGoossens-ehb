@@ -34,5 +34,4 @@ export function getDB() {
   return db;
 }
 
-//https://www.mongodb.com/docs/drivers/node/current/connect/mongoclient/
-//https://www.geeksforgeeks.org/mongodb/how-to-connect-mongodb-database-using-node-js/
+
