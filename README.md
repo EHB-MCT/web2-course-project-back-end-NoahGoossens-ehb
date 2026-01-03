@@ -1,6 +1,8 @@
 [![Open in Codespaces](https://classroom.github.com/assets/launch-codespace-2972f46106e565e64193e422d61a12cf1da4916b45550586e14ef0a7c637dd04.svg)](https://classroom.github.com/open-in-codespaces?assignment_repo_id=22123713)
-# Your project name ✨
-A short description of your project. Aim for 2-3 lines. \
+# GolfBuddy✨
+GolfBuddy helps golfers discover new courses across Belgium with ease.
+Explore nearby golf courses on an interactive map, read reviews, and share your own experiences.
+Your go-to platform for finding and enjoying the best golf spots around you.
 
 Website url: [website.be](website.be) (optional)
 
